@@ -29,6 +29,14 @@ git push --set-upstream origin your-branch-name
 7.	提交合并请求
 提交时添加标题和描述信息
 8. 等待审核，审核通过后，合并分支到主分支
+
+9. 如果在你提交之前，原始项目有更新，请同步更新到你的派生项目
+```bash
+git remote add upstream https://github.com/645359132/short-term1-homework.git
+git fetch upstream
+git checkout your-branch-name
+git merge upstream/main
+```
 # 二、环境配置
 1. 检查uv环境
 ```bash
@@ -42,3 +50,5 @@ cd your-local-project-path
 uv sync
 ```
 3. 没什么岔子就可以开始写代码了
+
+
