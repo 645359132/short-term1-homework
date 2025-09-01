@@ -38,6 +38,7 @@ uv --version
 
 2. 创建虚拟环境并安装依赖
 ```bash
+cd your-local-project-path
 uv sync
 ```
 3. 没什么岔子就可以开始写代码了
