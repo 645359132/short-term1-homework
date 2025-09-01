@@ -15,7 +15,7 @@ git clone https://github.com/your-user-name/your-fork-name.git
 git checkout -b your-branch-name
 ```
 
-4.	修改文档内容或者新增文档
+4.	修改代码内容或者新增代码删除代码等
 
 5.	提交更改 
 ```bash
