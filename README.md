@@ -36,6 +36,8 @@ git remote add upstream https://github.com/645359132/short-term1-homework.git
 git fetch upstream
 git checkout your-branch-name
 git merge upstream/main
+cd your-local-project-path
+uv sync
 ```
 # 二、环境配置
 1. 检查uv环境
