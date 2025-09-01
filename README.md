@@ -35,6 +35,7 @@ git push --set-upstream origin your-branch-name
 uv --version
 ```
 如果有报错，请移步 https://github.com/astral-sh/uv
+
 2. 创建虚拟环境并安装依赖
 ```bash
 uv sync
