@@ -5,6 +5,11 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
+    "black>=25.1.0",
+    "matplotlib>=3.10.6",
+    "openai>=1.104.2",
     "pandas>=2.3.2",
+    "pyecharts>=2.0.8",
     "requests>=2.32.5",
+    "scikit-learn>=1.7.1",
 ]

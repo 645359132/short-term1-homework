@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.cluster import KMeans
 from sklearn.preprocessing import StandardScaler
-from data import DATA  # 导入清洗后的数据集
+from data import CHINA_DATA, WORLD_DATA  # 导入清洗后的数据集
 from aver import city_yearly_avg  # 导入每个城市每年的平均值数据
 
 # 确保中文显示正常
@@ -13,41 +13,41 @@ plt.rcParams["axes.unicode_minus"] = False  # 解决负号显示问题
 # -------------------------- 手动添加中国主要城市经纬度 --------------------------
 # 格式：城市名称: {经度(lon), 纬度(lat)}，可根据实际数据中的城市补充或修改
 CHINA_CITY_COORDS = {
-    "Beijing": {"lon": 116.4074, "lat": 39.9042},       # 北京
-    "Shanghai": {"lon": 121.4737, "lat": 31.2304},     # 上海
-    "Guangzhou": {"lon": 113.2644, "lat": 23.1291},    # 广州
-    "Shenzhen": {"lon": 114.0669, "lat": 22.5429},    # 深圳
-    "Chengdu": {"lon": 104.0665, "lat": 30.5728},      # 成都
-    "Chongqing": {"lon": 106.5504, "lat": 29.5647},    # 重庆
-    "Wuhan": {"lon": 114.3055, "lat": 30.5928},       # 武汉
-    "Xi'an": {"lon": 108.9481, "lat": 34.2632},       # 西安
-    "Nanjing": {"lon": 118.7781, "lat": 32.0415},     # 南京
-    "Hangzhou": {"lon": 120.1551, "lat": 30.2741},    # 杭州
-    "Tianjin": {"lon": 117.2007, "lat": 39.0842},     # 天津
-    "Suzhou": {"lon": 120.6196, "lat": 31.3072},      # 苏州
-    "Wuxi": {"lon": 120.3017, "lat": 31.5789},       # 无锡
-    "Changsha": {"lon": 112.9822, "lat": 28.1944},    # 长沙
-    "Qingdao": {"lon": 120.3696, "lat": 36.0672},     # 青岛
-    "Ningbo": {"lon": 121.5469, "lat": 29.8683},      # 宁波
-    "Dalian": {"lon": 121.6146, "lat": 38.9140},      # 大连
-    "Xiamen": {"lon": 118.0894, "lat": 24.4798},      # 厦门
-    "Shenyang": {"lon": 123.4315, "lat": 41.8056},    # 沈阳
-    "Harbin": {"lon": 126.6376, "lat": 45.7560},      # 哈尔滨
+    "Beijing": {"lon": 116.4074, "lat": 39.9042},  # 北京
+    "Shanghai": {"lon": 121.4737, "lat": 31.2304},  # 上海
+    "Guangzhou": {"lon": 113.2644, "lat": 23.1291},  # 广州
+    "Shenzhen": {"lon": 114.0669, "lat": 22.5429},  # 深圳
+    "Chengdu": {"lon": 104.0665, "lat": 30.5728},  # 成都
+    "Chongqing": {"lon": 106.5504, "lat": 29.5647},  # 重庆
+    "Wuhan": {"lon": 114.3055, "lat": 30.5928},  # 武汉
+    "Xi'an": {"lon": 108.9481, "lat": 34.2632},  # 西安
+    "Nanjing": {"lon": 118.7781, "lat": 32.0415},  # 南京
+    "Hangzhou": {"lon": 120.1551, "lat": 30.2741},  # 杭州
+    "Tianjin": {"lon": 117.2007, "lat": 39.0842},  # 天津
+    "Suzhou": {"lon": 120.6196, "lat": 31.3072},  # 苏州
+    "Wuxi": {"lon": 120.3017, "lat": 31.5789},  # 无锡
+    "Changsha": {"lon": 112.9822, "lat": 28.1944},  # 长沙
+    "Qingdao": {"lon": 120.3696, "lat": 36.0672},  # 青岛
+    "Ningbo": {"lon": 121.5469, "lat": 29.8683},  # 宁波
+    "Dalian": {"lon": 121.6146, "lat": 38.9140},  # 大连
+    "Xiamen": {"lon": 118.0894, "lat": 24.4798},  # 厦门
+    "Shenyang": {"lon": 123.4315, "lat": 41.8056},  # 沈阳
+    "Harbin": {"lon": 126.6376, "lat": 45.7560},  # 哈尔滨
     " Zhengzhou": {"lon": 113.6654, "lat": 34.7579},  # 郑州
-    "Kunming": {"lon": 102.7126, "lat": 25.0406},     # 昆明
-    "Guiyang": {"lon": 106.7072, "lat": 26.5978},     # 贵阳
-    "Nanning": {"lon": 108.3162, "lat": 22.8240},     # 南宁
-    "Hefei": {"lon": 117.2830, "lat": 31.8617},      # 合肥
-    "Changzhou": {"lon": 119.9729, "lat": 31.7897},   # 常州
-    "Foshan": {"lon": 113.1227, "lat": 23.0287},      # 佛山
-    "Dongguan": {"lon": 113.7478, "lat": 23.0464},    # 东莞
-    "Zhuhai": {"lon": 113.5647, "lat": 22.2753},     # 珠海
-    "Wuhu": {"lon": 118.3773, "lat": 31.3377}         # 芜湖
+    "Kunming": {"lon": 102.7126, "lat": 25.0406},  # 昆明
+    "Guiyang": {"lon": 106.7072, "lat": 26.5978},  # 贵阳
+    "Nanning": {"lon": 108.3162, "lat": 22.8240},  # 南宁
+    "Hefei": {"lon": 117.2830, "lat": 31.8617},  # 合肥
+    "Changzhou": {"lon": 119.9729, "lat": 31.7897},  # 常州
+    "Foshan": {"lon": 113.1227, "lat": 23.0287},  # 佛山
+    "Dongguan": {"lon": 113.7478, "lat": 23.0464},  # 东莞
+    "Zhuhai": {"lon": 113.5647, "lat": 22.2753},  # 珠海
+    "Wuhu": {"lon": 118.3773, "lat": 31.3377},  # 芜湖
 }
 
 # -------------------------- 筛选数据集中的中国城市 --------------------------
 # 1. 获取数据集中所有城市名称
-dataset_cities = set(DATA["city_name"].unique())
+dataset_cities = set(WORLD_DATA["city_name"].unique())
 print(f"数据集中共包含 {len(dataset_cities)} 个城市")
 
 # 2. 筛选出同时存在于经纬度字典和数据集的中国城市
@@ -68,12 +68,14 @@ for city in matched_cities:
         yearly_values = city_yearly_avg[city]
         # 计算所有年份的平均碳排放（若有多年份数据）
         avg_carbon = sum(yearly_values.values()) / len(yearly_values)
-        analysis_data.append({
-            "city_name": city,
-            "lon": coords["lon"],
-            "lat": coords["lat"],
-            "avg_carbon": avg_carbon
-        })
+        analysis_data.append(
+            {
+                "city_name": city,
+                "lon": coords["lon"],
+                "lat": coords["lat"],
+                "avg_carbon": avg_carbon,
+            }
+        )
 
 # 转换为DataFrame便于后续处理
 df = pd.DataFrame(analysis_data)
@@ -118,13 +120,14 @@ fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(16, 8))
 
 # 1. 子图1：城市地理分布聚类（经度vs纬度）
 scatter1 = ax1.scatter(
-    df["lon"], df["lat"],
+    df["lon"],
+    df["lat"],
     c=df["cluster"],
     cmap="viridis",  # 颜色映射，可替换为"tab10"、"plasma"等
-    s=80,           # 点的大小
-    alpha=0.8,       # 透明度
+    s=80,  # 点的大小
+    alpha=0.8,  # 透明度
     edgecolors="white",  # 点的边框颜色
-    linewidths=0.5   # 点的边框宽度
+    linewidths=0.5,  # 点的边框宽度
 )
 # 添加城市名称标签（避免重叠，仅标注部分关键城市）
 key_cities = ["Beijing", "Shanghai", "Guangzhou", "Chengdu", "Chongqing"]
@@ -136,7 +139,7 @@ for _, row in df.iterrows():
             xytext=(5, 5),
             textcoords="offset points",
             fontsize=10,
-            bbox=dict(boxstyle="round,pad=0.3", facecolor="white", alpha=0.7)
+            bbox=dict(boxstyle="round,pad=0.3", facecolor="white", alpha=0.7),
         )
 ax1.set_xlabel("经度", fontsize=12)
 ax1.set_ylabel("纬度", fontsize=12)
@@ -148,13 +151,14 @@ cbar1.set_label("聚类类别", fontsize=12)
 
 # 2. 子图2：年均碳排放量vs纬度（展示碳排放与地理位置的关系）
 scatter2 = ax2.scatter(
-    df["avg_carbon"], df["lat"],
+    df["avg_carbon"],
+    df["lat"],
     c=df["cluster"],
     cmap="viridis",
     s=80,
     alpha=0.8,
     edgecolors="white",
-    linewidths=0.5
+    linewidths=0.5,
 )
 # 添加城市名称标签
 for _, row in df.iterrows():
@@ -165,7 +169,7 @@ for _, row in df.iterrows():
             xytext=(5, 5),
             textcoords="offset points",
             fontsize=10,
-            bbox=dict(boxstyle="round,pad=0.3", facecolor="white", alpha=0.7)
+            bbox=dict(boxstyle="round,pad=0.3", facecolor="white", alpha=0.7),
         )
 ax2.set_xlabel("年均碳排放量", fontsize=12)
 ax2.set_ylabel("纬度", fontsize=12)
@@ -183,15 +187,32 @@ print("聚类可视化图已保存为 china_city_clusters.png")
 
 # -------------------------- 聚类结果分析与保存 --------------------------
 # 1. 统计每个聚类的核心特征
-cluster_stats = df.groupby("cluster").agg({
-    "city_name": "count",          # 每个聚类的城市数量
-    "lon": "mean",                 # 每个聚类的平均经度
-    "lat": "mean",                 # 每个聚类的平均纬度
-    "avg_carbon": ["mean", "min", "max"]  # 每个聚类的碳排放统计（均值、最小值、最大值）
-}).round(4)
+cluster_stats = (
+    df.groupby("cluster")
+    .agg(
+        {
+            "city_name": "count",  # 每个聚类的城市数量
+            "lon": "mean",  # 每个聚类的平均经度
+            "lat": "mean",  # 每个聚类的平均纬度
+            "avg_carbon": [
+                "mean",
+                "min",
+                "max",
+            ],  # 每个聚类的碳排放统计（均值、最小值、最大值）
+        }
+    )
+    .round(4)
+)
 
 # 重命名列名，便于阅读
-cluster_stats.columns = ["城市数量", "平均经度", "平均纬度", "平均碳排放量", "最小碳排放量", "最大碳排放量"]
+cluster_stats.columns = [
+    "城市数量",
+    "平均经度",
+    "平均纬度",
+    "平均碳排放量",
+    "最小碳排放量",
+    "最大碳排放量",
+]
 print("\n-------------------------- 聚类结果统计 --------------------------")
 print(cluster_stats)
 
@@ -199,7 +220,9 @@ print(cluster_stats)
 print("\n-------------------------- 各聚类城市列表 --------------------------")
 for cluster in sorted(df["cluster"].unique()):
     cluster_cities = df[df["cluster"] == cluster]["city_name"].tolist()
-    print(f"聚类 {cluster}（共{len(cluster_cities)}个城市）：{', '.join(cluster_cities)}")
+    print(
+        f"聚类 {cluster}（共{len(cluster_cities)}个城市）：{', '.join(cluster_cities)}"
+    )
 
 # 3. 保存详细结果到CSV文件（便于后续分析）
 df.to_csv("china_city_cluster_results.csv", index=False, encoding="utf-8-sig")

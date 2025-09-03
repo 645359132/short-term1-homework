@@ -1,11 +1,12 @@
-from data import DATA
-city_yearly_count={}
-city_yearly_sum={}
+from data import CHINA_DATA, WORLD_DATA
 
-for index, row in DATA.iterrows():
-    city = row['city_name']
-    value = row['value']
-    year = row['year']
+city_yearly_count = {}
+city_yearly_sum = {}
+
+for index, row in WORLD_DATA.iterrows():
+    city = row["city_name"]
+    value = row["value"]
+    year = row["year"]
 
     if city not in city_yearly_sum:
         city_yearly_sum[city] = {}
@@ -20,7 +21,9 @@ for index, row in DATA.iterrows():
 
 city_yearly_avg = {}
 for city in city_yearly_sum:
-    city_yearly_avg[city] ={}
+    city_yearly_avg[city] = {}
     for year in city_yearly_sum[city]:
-        city_yearly_avg[city][year] = city_yearly_sum[city][year] / city_yearly_count[city][year]
+        city_yearly_avg[city][year] = (
+            city_yearly_sum[city][year] / city_yearly_count[city][year]
+        )
 print("每个城市每年的平均值：", city_yearly_avg)
