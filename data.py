@@ -228,6 +228,6 @@ data_obj = DataLoader(WORLD_MAIN_CITIES_DATA_URL)
 WORLD_DATA = data_obj.get_data()
 # DATA就是清洗后的DataFrame数据
 # print(DATA.head())
-china_data_obj = DataLoader(CHINA_PROVINCE_DATA_URL)
-CHINA_DATA = china_data_obj.get_data()
+# china_data_obj = DataLoader(CHINA_PROVINCE_DATA_URL)
+# CHINA_DATA = china_data_obj.get_data()
 # print (CHINA_DATA.head())

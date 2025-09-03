@@ -1,4 +1,4 @@
-from data import CHINA_DATA, WORLD_DATA
+from data import WORLD_DATA
 
 city_yearly_count = {}
 city_yearly_sum = {}
