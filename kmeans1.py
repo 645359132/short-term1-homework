@@ -2,13 +2,17 @@
 # 融合地理空间特征与碳排放特征，实现更精准的城市聚类
 
 # 1. 导入必要库
-from aver import calculate_average_by_year
 import pandas as pd
 import numpy as np
+import warnings
+import geopandas as gpd
+import matplotlib.pyplot as plt
+from matplotlib.lines import Line2D
 from sklearn.cluster import KMeans
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import silhouette_score  # 聚类效果评估
-import warnings
+from aver import calculate_average_by_year
+from sklearn.preprocessing import MinMaxScaler
 
 
 def kmeans_clustering():
@@ -241,8 +245,170 @@ def kmeans_clustering():
 
     # 8. 结果导出
     output_path = "全球城市双维度聚类结果（经纬度+碳排放）.csv"
+    draw_map(cluster_result)
     cluster_result.to_csv(output_path, index=False, encoding="utf-8-sig")
     print(f"\n" + "=" * 70)
     print(f" 双维度聚类结果已保存至：{output_path}")
     print(f" 结果包含：城市名称、经纬度（来自经纬度字典）、聚类标签、各年份排放数据")
     print("=" * 70)
+
+
+def draw_map(data):
+    # ==================== 1. 准备工作：配置环境和中文字体 ====================
+    # 配置matplotlib以支持中文显示
+    try:
+        plt.rcParams["font.sans-serif"] = ["SimHei"]  # 使用黑体
+        plt.rcParams["axes.unicode_minus"] = False  # 正常显示负号
+        print("中文字体 'SimHei' 设置成功。")
+    except:
+        print("警告：未找到 'SimHei' 字体。图表中的中文可能无法正常显示。")
+        print(
+            "请根据您的操作系统安装并配置中文字体（如 'Microsoft YaHei', 'PingFang SC' 等）。"
+        )
+
+    # ==================== 2. 模拟您的聚类结果数据 ====================
+    cluster_result = pd.DataFrame(data)
+    print("\n模拟的聚类结果数据：")
+    print(cluster_result)
+
+    # ==================== 3. 加载地图数据并进行数据转换 ====================
+    map_file_path = "china-map.json"
+    try:
+        china_map = gpd.read_file(map_file_path)
+        print(f"\n成功加载地图文件: '{map_file_path}'")
+    except Exception as e:
+        print(f"\n错误：无法加载地图文件 '{map_file_path}'。")
+        print(
+            f"请从 http://datav.aliyun.com/portal/school/atlas/area_selector 下载并放置到正确位置。"
+        )
+        print(f"详细错误信息: {e}")
+        exit()
+
+    # 将您的城市数据 DataFrame 转换为 GeoDataFrame
+    # **注意这里的列名已根据您的描述更新**
+    gdf_cities = gpd.GeoDataFrame(
+        cluster_result,
+        geometry=gpd.points_from_xy(
+            cluster_result["经度（经纬度字典）"], cluster_result["纬度（经纬度字典）"]
+        ),
+    )
+
+    # ==================== 4. 开始绘图 ====================
+    for year in range(2019, 2026):
+        fig, ax = plt.subplots(1, 1, figsize=(18, 15))
+
+        # 1. 绘制底图
+        china_map.plot(ax=ax, edgecolor="black", facecolor="whitesmoke", linewidth=0.5)
+
+        # 2. 定义颜色和大小
+        # 颜色逻辑保持不变
+        colors = plt.cm.tab10.colors
+        unique_labels = sorted(gdf_cities["聚类标签"].unique())
+        cluster_colors = {
+            label: colors[i % len(colors)] for i, label in enumerate(unique_labels)
+        }
+        point_colors = gdf_cities["聚类标签"].map(cluster_colors)
+
+        # *** 关键修改：使用MinMaxScaler对碳排放数据进行归一化以确定大小 ***
+        emission_col = f"{year}年排放均值"
+        min_size, max_size = 50, 1000  # 定义气泡的最小和最大尺寸
+
+        # 创建一个MinMaxScaler实例
+        scaler = MinMaxScaler(feature_range=(min_size, max_size))
+
+        # 对排放数据进行拟合和转换，注意要将Series转换为[[v1], [v2], ...]的格式
+        emission_values = gdf_cities[emission_col].values.reshape(-1, 1)
+        point_sizes = scaler.fit_transform(emission_values)
+
+        # 3. 在地图上绘制气泡
+        ax.scatter(
+            gdf_cities.geometry.x,
+            gdf_cities.geometry.y,
+            s=point_sizes,
+            c=point_colors,
+            alpha=0.75,
+            edgecolor="black",  # 添加边框让气泡更清晰
+            linewidth=0.5,
+            zorder=10,
+        )
+
+        # 4. 添加城市名称标签
+        for x, y, label in zip(
+            gdf_cities.geometry.x, gdf_cities.geometry.y, gdf_cities["城市名称"]
+        ):
+            ax.text(x + 0.5, y + 0.5, label, fontsize=10, ha="left")
+
+        # 5. 美化图表和添加图例
+        ax.set_xticks([])
+        ax.set_yticks([])
+        ax.set_axis_off()
+        ax.set_title(
+            f"中国主要城市双维度聚类地理分布图 (基于{year}年数据)",
+            fontdict={"fontsize": 22, "fontweight": "bold"},
+        )
+        ax.set_facecolor("#aed6f1")  # 使用一个柔和的蓝色作为背景
+
+        # --- 创建自定义图例 ---
+        # 聚类标签图例（颜色）
+        legend_elements_cluster = [
+            Line2D(
+                [0],
+                [0],
+                marker="o",
+                color="w",
+                label=f"聚类 {key}",
+                markerfacecolor=value,
+                markersize=12,
+            )
+            for key, value in sorted(cluster_colors.items())
+        ]
+
+        # *** 关键修改：创建更智能的大小图例 ***
+        # 碳排放量图例（大小）
+        min_e, max_e = gdf_cities[emission_col].min(), gdf_cities[emission_col].max()
+        # 选择3个代表性的排放值：最小值，中间值，最大值
+        legend_emission_values = [min_e, (min_e + max_e) / 2, max_e]
+
+        # 使用之前创建的scaler来转换这些代表值，以获得正确的图例标记大小
+        legend_marker_sizes = scaler.transform(
+            pd.Series(legend_emission_values).values.reshape(-1, 1)
+        )
+
+        legend_elements_size = []
+        for i, emission_val in enumerate(legend_emission_values):
+            legend_elements_size.append(
+                Line2D(
+                    [0],
+                    [0],
+                    marker="o",
+                    color="w",
+                    # **关键修改：使用.2f格式化浮点数，显示两位小数**
+                    label=f"{emission_val:.2f}",
+                    markerfacecolor="gray",
+                    markersize=legend_marker_sizes[i] ** 0.5,
+                )  # marker size在legend中与s的单位不同，通常需要开根号调整
+            )
+
+        # 合并图例并显示
+        legend1 = ax.legend(
+            handles=legend_elements_cluster,
+            title="聚类类别",
+            loc="lower left",
+            fontsize=12,
+            title_fontsize=14,
+        )
+        ax.add_artist(legend1)
+        legend2 = ax.legend(
+            handles=legend_elements_size,
+            title=f"{year}年碳排放均值",
+            loc="lower right",
+            fontsize=12,
+            title_fontsize=14,
+        )
+
+        # ==================== 6. 显示并保存图像 ====================
+        plt.tight_layout()
+        output_path = f"中国城市双维度聚类地理分布图-{year}.png"
+        plt.savefig(output_path, dpi=300, bbox_inches="tight")
+        print(f"\n可视化图表已成功保存至: '{output_path}'")
+        plt.show()

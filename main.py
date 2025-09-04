@@ -12,7 +12,6 @@ def main():
 
     ai_analysis()
 
-
     input("\n所有业务执行完成，按Enter退出程序...")
 
 

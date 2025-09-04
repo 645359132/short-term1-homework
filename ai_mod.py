@@ -619,8 +619,6 @@ def ai_analysis():
             # 5. 提示用户可以开始新一轮分析
             print("\n" + "🔄 您可以开始新一轮的城市/部门分析 ".center(60, "="))
 
-
     except Exception as e:
         print(f"\n❌ 程序运行出现致命错误: {str(e)}")
         print("💡 请检查数据文件、网络连接和API配置")
-

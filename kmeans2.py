@@ -1,8 +1,8 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-from data import CHINA_DATA
 import warnings
+from data import CHINA_DATA
 
 warnings.filterwarnings("ignore")
 
