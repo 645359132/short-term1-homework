@@ -1,9 +1,9 @@
-from data import WORLD_DATA
+from data import CHINA_DATA
 
 city_yearly_count = {}
 city_yearly_sum = {}
 
-for index, row in WORLD_DATA.iterrows():
+for index, row in CHINA_DATA.iterrows():
     city = row["city_name"]
     value = row["value"]
     year = row["year"]
