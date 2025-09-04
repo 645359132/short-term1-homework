@@ -11,13 +11,13 @@ from matplotlib.lines import Line2D
 from sklearn.cluster import KMeans
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import silhouette_score  # 聚类效果评估
-from aver import calculate_average_by_year
+from aver import calculate_average_by_year, CHINA_DATA
 from sklearn.preprocessing import MinMaxScaler
 
 
 def kmeans_clustering():
     warnings.filterwarnings("ignore")  # 忽略无关警告
-    avg = calculate_average_by_year()
+    avg = calculate_average_by_year(CHINA_DATA)
     # 2. 全球城市经纬度字典（地理特征核心数据）
     city_coords = {
         "Anhui": (31.8617, 117.2853),  # 安徽（省会合肥坐标）

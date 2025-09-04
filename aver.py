@@ -1,11 +1,11 @@
-from data import CHINA_DATA
+from data import CHINA_DATA, WORLD_DATA
 
 
-def calculate_average_by_year():
+def calculate_average_by_year(data):
     city_yearly_count = {}
     city_yearly_sum = {}
 
-    for index, row in CHINA_DATA.iterrows():
+    for index, row in data.iterrows():
         city = row["city_name"]
         value = row["value"]
         year = row["year"]
