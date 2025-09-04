@@ -53,4 +53,10 @@ uv sync
 ```
 3. 没什么岔子就可以开始写代码了
 
+# 三、运行项目
+```bash
+cd your-local-project-path
+uv run main.py
+```
+
 

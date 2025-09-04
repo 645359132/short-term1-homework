@@ -8,15 +8,19 @@ from openai import OpenAI
 import json
 import warnings
 
-warnings.filterwarnings('ignore')
+warnings.filterwarnings("ignore")
 
 # 解决中文字体显示问题
-plt.rcParams['font.sans-serif'] = ['SimHei', 'Microsoft YaHei', 'DejaVu Sans']  # 指定默认字体
-plt.rcParams['axes.unicode_minus'] = False  # 解决保存图像时负号'-'显示为方块的问题
+plt.rcParams["font.sans-serif"] = [
+    "SimHei",
+    "Microsoft YaHei",
+    "DejaVu Sans",
+]  # 指定默认字体
+plt.rcParams["axes.unicode_minus"] = False  # 解决保存图像时负号'-'显示为方块的问题
 
 # 设置图表样式
 sns.set_style("whitegrid")
-plt.rcParams['figure.figsize'] = (15, 6)
+plt.rcParams["figure.figsize"] = (15, 6)
 
 # OpenAI客户端配置
 client = OpenAI(
@@ -40,21 +44,21 @@ class CarbonEmissionAnalyzer:
 
         # 尝试不同的中文字体
         chinese_fonts = [
-            'SimHei',  # 黑体
-            'Microsoft YaHei',  # 微软雅黑
-            'SimSun',  # 宋体
-            'KaiTi',  # 楷体
-            'FangSong',  # 仿宋
-            'STSong',  # 华文宋体
-            'STKaiti',  # 华文楷体
-            'STHeiti',  # 华文黑体
+            "SimHei",  # 黑体
+            "Microsoft YaHei",  # 微软雅黑
+            "SimSun",  # 宋体
+            "KaiTi",  # 楷体
+            "FangSong",  # 仿宋
+            "STSong",  # 华文宋体
+            "STKaiti",  # 华文楷体
+            "STHeiti",  # 华文黑体
         ]
 
         available_fonts = [f.name for f in fm.fontManager.ttflist]
 
         for font in chinese_fonts:
             if font in available_fonts:
-                plt.rcParams['font.sans-serif'] = [font]
+                plt.rcParams["font.sans-serif"] = [font]
                 print(f"✅ 成功设置中文字体: {font}")
                 return
 
@@ -71,43 +75,57 @@ class CarbonEmissionAnalyzer:
 
         # 筛选数据
         filtered_data = self.data[
-            (self.data['city_name'] == city) &
-            (self.data['sector'] == sector)
-            ].copy()
+            (self.data["city_name"] == city) & (self.data["sector"] == sector)
+        ].copy()
 
         if filtered_data.empty:
             print(f"未找到 {city} - {sector} 的数据")
             return None
 
         # 确保日期格式正确
-        filtered_data['date'] = pd.to_datetime(filtered_data['date'])
-        filtered_data = filtered_data.sort_values('date')
+        filtered_data["date"] = pd.to_datetime(filtered_data["date"])
+        filtered_data = filtered_data.sort_values("date")
 
         # 绘制图表
         fig, ax = plt.subplots(figsize=(15, 6))
 
         # 绘制线图
-        ax.plot(filtered_data['date'], filtered_data['value'],
-                'b-', marker='o', markersize=3, alpha=0.7, linewidth=2)
+        ax.plot(
+            filtered_data["date"],
+            filtered_data["value"],
+            "b-",
+            marker="o",
+            markersize=3,
+            alpha=0.7,
+            linewidth=2,
+        )
 
         # 设置标题和标签（处理中文显示问题）
         try:
-            ax.set_title(f'{city} - {sector} 碳排放趋势分析', fontsize=16, pad=20)
-            ax.set_xlabel('日期', fontsize=12)
-            ax.set_ylabel('CO2排放量 (吨)', fontsize=12)
+            ax.set_title(f"{city} - {sector} 碳排放趋势分析", fontsize=16, pad=20)
+            ax.set_xlabel("日期", fontsize=12)
+            ax.set_ylabel("CO2排放量 (吨)", fontsize=12)
         except:
             # 如果中文显示有问题，使用英文
-            ax.set_title(f'{city} - {sector} Carbon Emission Trend Analysis', fontsize=16, pad=20)
-            ax.set_xlabel('Date', fontsize=12)
-            ax.set_ylabel('CO2 Emissions (tons)', fontsize=12)
+            ax.set_title(
+                f"{city} - {sector} Carbon Emission Trend Analysis", fontsize=16, pad=20
+            )
+            ax.set_xlabel("Date", fontsize=12)
+            ax.set_ylabel("CO2 Emissions (tons)", fontsize=12)
 
         # 美化图表
         ax.grid(True, alpha=0.3)
-        ax.tick_params(axis='x', rotation=45)
+        ax.tick_params(axis="x", rotation=45)
 
         # 添加数据统计信息
-        mean_value = filtered_data['value'].mean()
-        ax.axhline(y=mean_value, color='r', linestyle='--', alpha=0.5, label=f'平均值: {mean_value:.2f}')
+        mean_value = filtered_data["value"].mean()
+        ax.axhline(
+            y=mean_value,
+            color="r",
+            linestyle="--",
+            alpha=0.5,
+            label=f"平均值: {mean_value:.2f}",
+        )
         ax.legend()
 
         plt.tight_layout()
@@ -117,36 +135,35 @@ class CarbonEmissionAnalyzer:
         except Exception as e:
             print(f"图表显示可能有问题: {e}")
             # 保存图片作为备选方案
-            plt.savefig('carbon_emission_trend.png', dpi=300, bbox_inches='tight')
+            plt.savefig("carbon_emission_trend.png", dpi=300, bbox_inches="tight")
             print("📊 图表已保存为 carbon_emission_trend.png")
 
         return filtered_data
 
-    def detect_anomalies(self, data, start_date='2022-01-25', end_date='2022-02-28'):
+    def detect_anomalies(self, data, start_date="2022-01-25", end_date="2022-02-28"):
         """检测异常数据"""
         anomalous_period = data[
-            (data['date'] >= start_date) &
-            (data['date'] <= end_date)
-            ]
+            (data["date"] >= start_date) & (data["date"] <= end_date)
+        ]
 
         if anomalous_period.empty:
             return None
 
         # 找到最小值作为异常点
-        anomaly = anomalous_period.loc[anomalous_period['value'].idxmin()]
+        anomaly = anomalous_period.loc[anomalous_period["value"].idxmin()]
 
         # 计算统计信息
-        mean_value = data['value'].mean()
-        std_value = data['value'].std()
+        mean_value = data["value"].mean()
+        std_value = data["value"].std()
 
         anomaly_info = {
-            'date': anomaly['date'].strftime('%Y-%m-%d'),
-            'value': float(anomaly['value']),
-            'city': anomaly.get('city_name', 'Unknown'),
-            'sector': anomaly.get('sector', 'Unknown'),
-            'mean_value': mean_value,
-            'std_value': std_value,
-            'deviation': (float(anomaly['value']) - mean_value) / std_value
+            "date": anomaly["date"].strftime("%Y-%m-%d"),
+            "value": float(anomaly["value"]),
+            "city": anomaly.get("city_name", "Unknown"),
+            "sector": anomaly.get("sector", "Unknown"),
+            "mean_value": mean_value,
+            "std_value": std_value,
+            "deviation": (float(anomaly["value"]) - mean_value) / std_value,
         }
 
         print("\n" + "🔍 异常数据检测结果".center(50, "="))
@@ -157,7 +174,9 @@ class CarbonEmissionAnalyzer:
         print(f"  数据均值: {anomaly_info['mean_value']:.2f} 吨 CO2")
         print(f"  标准差: {anomaly_info['std_value']:.2f}")
         print(f"  偏差程度: {anomaly_info['deviation']:.2f} 个标准差")
-        print(f"  异常类型: {'异常低点' if anomaly_info['deviation'] < -1 else '正常范围'}")
+        print(
+            f"  异常类型: {'异常低点' if anomaly_info['deviation'] < -1 else '正常范围'}"
+        )
         print("=" * 50)
 
         return anomaly_info
@@ -170,23 +189,23 @@ class CarbonEmissionAnalyzer:
 
         def fetch_news(api_key, city, date):
             # 构建更好的查询词
-            if city.lower() == 'beijing':
+            if city.lower() == "beijing":
                 query = '(Beijing OR 北京 OR "Chinese New Year" OR "Winter Olympics" OR COVID OR lockdown)'
             else:
                 query = f'"{city}"'
 
-            date_obj = datetime.strptime(date, '%Y-%m-%d')
-            from_date = (date_obj - timedelta(days=5)).strftime('%Y-%m-%d')
-            to_date = (date_obj + timedelta(days=5)).strftime('%Y-%m-%d')
+            date_obj = datetime.strptime(date, "%Y-%m-%d")
+            from_date = (date_obj - timedelta(days=5)).strftime("%Y-%m-%d")
+            to_date = (date_obj + timedelta(days=5)).strftime("%Y-%m-%d")
 
             url = (
-                'https://newsapi.org/v2/everything?'
-                f'q={query}&'
-                f'from={from_date}&to={to_date}&'
-                f'language=en&'
-                f'sortBy=relevancy&'
-                f'pageSize=10&'
-                f'apiKey={api_key}'
+                "https://newsapi.org/v2/everything?"
+                f"q={query}&"
+                f"from={from_date}&to={to_date}&"
+                f"language=en&"
+                f"sortBy=relevancy&"
+                f"pageSize=10&"
+                f"apiKey={api_key}"
             )
 
             try:
@@ -194,9 +213,11 @@ class CarbonEmissionAnalyzer:
                 response.raise_for_status()
                 data = response.json()
 
-                if data.get('status') == 'ok':
-                    articles = data.get('articles', [])
-                    headlines = [article['title'] for article in articles if article.get('title')]
+                if data.get("status") == "ok":
+                    articles = data.get("articles", [])
+                    headlines = [
+                        article["title"] for article in articles if article.get("title")
+                    ]
                     return headlines[:8]  # 返回前8条
                 else:
                     print(f"NewsAPI返回错误: {data.get('message', '未知错误')}")
@@ -292,17 +313,17 @@ class CarbonEmissionAnalyzer:
                 model="gpt-3.5-turbo",
                 messages=[
                     {"role": "system", "content": system_prompt},
-                    {"role": "user", "content": user_question}
+                    {"role": "user", "content": user_question},
                 ],
                 temperature=0.6,  # 稍微降低随机性，提高专业性
                 max_tokens=2000,  # 增加输出长度
-                top_p=0.9
+                top_p=0.9,
             )
 
             analysis_result = completion.choices[0].message.content
-            self.analysis_results['ai_analysis'] = analysis_result
-            self.analysis_results['anomaly_info'] = anomaly_info
-            self.analysis_results['news_context'] = news_headlines
+            self.analysis_results["ai_analysis"] = analysis_result
+            self.analysis_results["anomaly_info"] = anomaly_info
+            self.analysis_results["news_context"] = news_headlines
 
             print("\n" + "🎯 AI专家深度分析报告".center(80, "="))
             print(analysis_result)
@@ -334,7 +355,7 @@ class CarbonEmissionAnalyzer:
             try:
                 user_question = input("\n🗣️  请输入你的问题: ").strip()
 
-                if user_question.lower() in ['quit', 'exit', '退出', 'q', '']:
+                if user_question.lower() in ["quit", "exit", "退出", "q", ""]:
                     print("👋 感谢使用AI专家咨询系统，再见！")
                     break
 
@@ -346,14 +367,19 @@ class CarbonEmissionAnalyzer:
 
                 # 构建对话上下文
                 context_messages = [
-                    {"role": "system", "content": """你是专业的碳排放数据分析专家。基于之前的分析结果，请回答用户的问题。
-                    保持专业、准确、有见地。如果问题超出分析范围，请诚实说明并提供相关建议。"""}
+                    {
+                        "role": "system",
+                        "content": """你是专业的碳排放数据分析专家。基于之前的分析结果，请回答用户的问题。
+                    保持专业、准确、有见地。如果问题超出分析范围，请诚实说明并提供相关建议。""",
+                    }
                 ]
 
                 # 添加分析背景
                 if self.analysis_results:
                     background = f"分析背景：{json.dumps(self.analysis_results, ensure_ascii=False, indent=2)}"
-                    context_messages.append({"role": "assistant", "content": background})
+                    context_messages.append(
+                        {"role": "assistant", "content": background}
+                    )
 
                 # 添加对话历史（最近3轮）
                 for msg in conversation_history[-6:]:  # 保留最近3轮对话
@@ -367,7 +393,7 @@ class CarbonEmissionAnalyzer:
                     messages=context_messages,
                     temperature=0.7,
                     max_tokens=1200,
-                    top_p=0.9
+                    top_p=0.9,
                 )
 
                 response = completion.choices[0].message.content
@@ -390,13 +416,13 @@ class CarbonEmissionAnalyzer:
 
     def get_available_cities(self):
         """获取所有可用的城市"""
-        cities = self.data['city_name'].unique()
+        cities = self.data["city_name"].unique()
         return sorted(cities)
 
     def get_available_sectors(self, city):
         """获取指定城市的所有可用部门"""
-        city_data = self.data[self.data['city_name'] == city]
-        sectors = city_data['sector'].unique()
+        city_data = self.data[self.data["city_name"] == city]
+        sectors = city_data["sector"].unique()
         return sorted(sectors)
 
 
@@ -411,8 +437,10 @@ def select_city_and_sector(analyzer):
 
     # 按列显示城市，每行4个
     for i in range(0, len(cities), 4):
-        row_cities = cities[i:i + 4]
-        formatted_cities = [f"{j + i + 1:2d}. {city:<15}" for j, city in enumerate(row_cities)]
+        row_cities = cities[i : i + 4]
+        formatted_cities = [
+            f"{j + i + 1:2d}. {city:<15}" for j, city in enumerate(row_cities)
+        ]
         print("  ".join(formatted_cities))
 
     # 2. 让用户选择城市
@@ -425,7 +453,7 @@ def select_city_and_sector(analyzer):
 
             user_input = input("\n👉 请输入: ").strip()
 
-            if user_input.lower() in ['quit', 'exit', '退出', 'q']:
+            if user_input.lower() in ["quit", "exit", "退出", "q"]:
                 return None, None
 
             # 尝试作为数字解析
@@ -439,7 +467,9 @@ def select_city_and_sector(analyzer):
                     continue
 
             # 尝试作为城市名称匹配
-            matching_cities = [city for city in cities if user_input.lower() in city.lower()]
+            matching_cities = [
+                city for city in cities if user_input.lower() in city.lower()
+            ]
             if len(matching_cities) == 1:
                 selected_city = matching_cities[0]
                 break
@@ -477,9 +507,9 @@ def select_city_and_sector(analyzer):
 
             user_input = input("\n👉 请输入: ").strip()
 
-            if user_input.lower() in ['quit', 'exit', '退出', 'q']:
+            if user_input.lower() in ["quit", "exit", "退出", "q"]:
                 return None, None
-            elif user_input.lower() in ['back', '返回', 'b']:
+            elif user_input.lower() in ["back", "返回", "b"]:
                 return select_city_and_sector(analyzer)  # 递归调用重新选择
 
             # 尝试作为数字解析
@@ -493,7 +523,9 @@ def select_city_and_sector(analyzer):
                     continue
 
             # 尝试作为部门名称匹配
-            matching_sectors = [sector for sector in sectors if user_input.lower() in sector.lower()]
+            matching_sectors = [
+                sector for sector in sectors if user_input.lower() in sector.lower()
+            ]
             if len(matching_sectors) == 1:
                 selected_sector = matching_sectors[0]
                 break
@@ -516,74 +548,79 @@ def select_city_and_sector(analyzer):
     return selected_city, selected_sector
 
 
-def main():
-    """主函数"""
+def ai_analysis():
+    """主函数，包含了循环分析的逻辑"""
     print("🌍 碳排放数据AI分析系统启动".center(60, "="))
 
     try:
-        # 初始化分析器
+        # 1. 初始化分析器 (只需一次，放在循环外)
         analyzer = CarbonEmissionAnalyzer(CHINA_DATA, client)
 
-        # 设置分析参数
-        # city = 'Shanghai'
-        # sector = 'Industry'
-
-        city, sector = select_city_and_sector(analyzer)
-
-        if city is None or sector is None:
-            print("👋 用户退出，程序结束")
-            return
-
-        print(f"\n📍 分析目标: {city} - {sector}")
-
-        # 1. 数据筛选和可视化
-        print("\n📊 第一步: 数据筛选和可视化")
-        filtered_data = analyzer.filter_and_plot_data(city, sector)
-
-        if filtered_data is None:
-            print("❌ 无法获取数据，程序退出")
-            return
-
-        print(f"✅ 成功加载 {len(filtered_data)} 条数据记录")
-
-        # 2. 异常检测
-        print("\n🔍 第二步: 异常数据检测")
-        anomaly_info = analyzer.detect_anomalies(filtered_data)
-
-        if anomaly_info is None:
-            print("❌ 未检测到异常数据，程序退出")
-            return
-
-        # 3. 获取新闻背景（可选）
-        # print("\n📰 第三步: 新闻背景收集")
-        NEWS_API_KEY = '9b99c057d28c405a9d321591f0d2c1c5'  # 请替换为实际的API密钥
-        news_headlines = analyzer.get_news_context(
-            anomaly_info['city'],
-            anomaly_info['date'],
-            api_key=None
-        )
-
-        # 4. AI深度分析
-        print("\n🤖 第三步: AI深度分析")
-        analyzer.ai_analysis(anomaly_info, news_headlines)
-
-        # 5. 交互式问答
-        print("\n🎯 第四步: 交互式专家咨询")
+        # 2. 创建一个无限循环，以便用户可以进行多次分析
         while True:
-            choice = input("\n❓ 是否需要AI专家进一步咨询？(y/n): ").strip().lower()
-            if choice in ['y', 'yes', '是', '1']:
-                analyzer.interactive_analysis()
-                break
-            elif choice in ['n', 'no', '否', '0']:
-                print("✨ 分析完成，感谢使用碳排放AI分析系统！")
-                break
-            else:
-                print("❓ 请输入 y 或 n")
+            # 3. 进入城市和部门选择流程
+            city, sector = select_city_and_sector(analyzer)
+
+            # 4. 检查用户是否选择退出
+            # 如果select_city_and_sector返回None, None，说明用户想退出程序
+            if city is None or sector is None:
+                print("\n👋 感谢使用，程序已退出。")
+                break  # 跳出 while True 循环，结束程序
+
+            # --- 开始单次分析流程 ---
+            print(f"\n📍 分析目标: {city} - {sector}")
+
+            # 步骤一: 数据筛选和可视化
+            print("\n📊 第一步: 数据筛选和可视化")
+            filtered_data = analyzer.filter_and_plot_data(city, sector)
+
+            if filtered_data is None:
+                print("❌ 无法获取数据，请尝试选择其他目标。")
+                # 使用 continue 跳过本次循环的剩余部分，直接开始下一次选择
+                print("\n" + "🔄 准备开始新一轮分析 ".center(60, "="))
+                continue
+
+            print(f"✅ 成功加载 {len(filtered_data)} 条数据记录")
+
+            # 步骤二: 异常检测
+            print("\n🔍 第二步: 异常数据检测")
+            anomaly_info = analyzer.detect_anomalies(filtered_data)
+
+            if anomaly_info is None:
+                print("❌ 在指定时间段内未检测到可分析的异常数据，请尝试其他目标。")
+                print("\n" + "🔄 准备开始新一轮分析 ".center(60, "="))
+                continue
+
+            # 步骤三: 获取新闻背景（可选）
+            # NEWS_API_KEY = "YOUR_API_KEY"
+            news_headlines = analyzer.get_news_context(
+                anomaly_info["city"], anomaly_info["date"], api_key=None
+            )
+
+            # 步骤四: AI深度分析
+            print("\n🤖 第三步: AI深度分析")
+            analyzer.ai_analysis(anomaly_info, news_headlines)
+
+            # 步骤五: 交互式问答
+            print("\n🎯 第四步: 交互式专家咨询")
+            while True:
+                choice = input("\n❓ 是否需要AI专家进一步咨询？(y/n): ").strip().lower()
+                if choice in ["y", "yes", "是", "1"]:
+                    analyzer.interactive_analysis()
+                    break
+                elif choice in ["n", "no", "否", "0"]:
+                    print("✨ 本轮分析完成！")
+                    break
+                else:
+                    print("❓ 请输入 y 或 n")
+
+            # --- 单次分析流程结束 ---
+
+            # 5. 提示用户可以开始新一轮分析
+            print("\n" + "🔄 您可以开始新一轮的城市/部门分析 ".center(60, "="))
+
 
     except Exception as e:
-        print(f"\n❌ 程序运行出现错误: {str(e)}")
+        print(f"\n❌ 程序运行出现致命错误: {str(e)}")
         print("💡 请检查数据文件、网络连接和API配置")
 
-
-# if __name__ == "__main__":
-main()
