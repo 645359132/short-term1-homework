@@ -152,9 +152,9 @@ def kmeans_clustering_world_data():
 
     # 6. 双维度KMeans聚类（优化参数确保稳定性）
     print(f"\n" + "=" * 70)
-    print("双维度KMeans聚类（5类，适配双维度特征）")
+    print("双维度KMeans聚类（3类，适配双维度特征）")
     print("=" * 70)
-    n_clusters = 5  # 双维度聚类建议5类（比单维度多1类，体现空间+排放的细分度）
+    n_clusters = 3
     kmeans = KMeans(
         n_clusters=n_clusters,
         random_state=42,  # 固定随机种子，结果可复现
