@@ -143,7 +143,7 @@ def draw_geographic_map(data):
         # 美化与图例
         ax.set_axis_off()
         ax.set_title(
-            f"中国主要城市双维度聚类地理分布图 ({year}年)",
+            f"中国各省份双维度聚类地理分布图 ({year}年)",
             fontdict={"fontsize": 22, "fontweight": "bold"},
         )
         ax.set_facecolor("#aed6f1")
@@ -197,7 +197,7 @@ def draw_geographic_map(data):
 
         # 保存与显示
         plt.tight_layout()
-        output_path = f"中国城市双维度聚类地理分布图-{year}.png"
+        output_path = f"中国省份双维度聚类地理分布图-{year}.png"
         plt.savefig(output_path, dpi=300, bbox_inches="tight")
         print(f"可视化图表已成功保存至: '{output_path}'")
         plt.show()
@@ -206,6 +206,7 @@ def draw_geographic_map(data):
 def run_full_analysis():
     """主分析函数，整合数据处理、聚类、评估和可视化"""
     warnings.filterwarnings("ignore")
+    print("函数开始执行，稍安勿躁...")
 
     # 准备工作：配置中文字体
     try:

@@ -267,7 +267,7 @@ def kmeans_clustering_world_data():
     world_map = folium.Map(location=[30, 0], zoom_start=2, tiles="CartoDB positron")
 
     # 4. 定义颜色映射和聚类标签解释
-    # 为5个聚类定义不同的、易于区分的颜色
+    # 为聚类定义不同的、易于区分的颜色
     colors = [
         "#FF5733",  # 亮橙色
         "#337BFF",  # 蓝色
